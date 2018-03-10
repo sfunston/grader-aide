@@ -76,6 +76,7 @@
 <script>
 /* global axios */
 /* global Vue */
+/* global value */
 let app = new Vue({
   el: '#app',
   data: { //persisted data
@@ -125,8 +126,8 @@ let app = new Vue({
 	},
 	requestUpdate: function(myRef) {
 		this.comments.text[myRef] = this.$refs[myRef].innerText;
-		this.totalPoints(myRef) = this.$refs(myRef).innerText;
-		this.asName(myRef) = this.$refs(myRef).innerText;
+		this.totalPoints[myRef] = this.$refs[myRef].innerText;
+		this.asName[myRef] = this.$refs[myRef].innerText;
 	},
 	clearComments: function() {
 		this.comments = [];
