@@ -6,43 +6,46 @@
   <title>GraderAide</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <style>
-     .clickable {
-       cursor: pointer;
-     }
-     .removeButton {
-       color: red;
-     }
+    .clickable {
+      cursor: pointer;
+    }
+
+    .removeButton {
+      color: red;
+    }
   </style>
-  
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script><!-- TODO -->
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
+  <!-- TODO -->
   <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
 </head>
 
 <body>
   <div class="container" id="app">
     <div class="row">
-      
+
       <!-- title row -->
       <div class="col-xl-6 offset-xl-3">
-        <h1 contenteditable="true" ref="asName" @blur="requestUpdate('asName')">{{name}}</h1><!-- TODO -->
+        <h1 contenteditable="true" ref="asName" @blur="requestUpdate('asName')">{{name}}</h1>
+        <!-- TODO -->
         <h4 contenteditable="true" ref="totalPoints" @blur="requestUpdate('totalPoints')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
-        
+
 
         <!-- rules rows -->
-        <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
-          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            {{rule.pts | positive}} {{rule.desc}}
-            <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
-            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
-            <br>
+        <div v-for="(rule, i) of rules" :key="rule.desc">
+          <!-- TODO -->
+          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
+          <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+          <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
+          <br>
           </input>
         </div>
-        
+
         <!-- add row -->
         <div v-if="plusFormActive">
           <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()" title="pts (positive or negative)">
-          <input type="text"   class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
+          <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
           <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
         </div>
 
@@ -56,127 +59,145 @@
           <b>Good Job</b>
           <hr> {{actualPts}}
         </div>
-		  
-			<!-- add comment -->
-			<div>
-			  <h2>Comments</h2>
-				<span v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">
+
+        <!-- add comment -->
+        <div>
+          <h2>Comments</h2>
+          <span v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">
 					{{comment.text}}<br>
 				</span>
-			</div>
-			<div>
-				<textarea id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
-				<br>
-				<button @click="clearComments">Clear comments</button>
-			</div>
+        </div>
+        <div>
+          <textarea id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
+          <br>
+          <button @click="clearComments">Clear comments</button>
+        </div>
+        
+        <!-- save assignment -->
+        <div>
+          <button @click="saveToServer">Save</button>
+        </div>
       </div>
-    </div>    
+    </div>
   </div>
 
-<script>
-/* global axios */
-/* global Vue */
-/* global value */
-let app = new Vue({
-  el: '#app',
-  data: { //persisted data
-    name: null,
-    totalPts: 0,
-    rules: [],
-	  comments: [],
-    //temporary gui state
-    selectedRules: [],
-    addNum: null,
-    addDesc: null,
-    plusFormActive: false
-  },
-  filters: {
-    positive: function(num) { //TODO make all caps
-      if (num > 0) return `+${num}`;
-      return num;
-    }
-  },
-  computed: {
-    actualPts: function() { //add up all selected pts and subtract from totalPts
-      return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+  <script>
+    /* global axios */
+    /* global Vue */
+    let app = new Vue({
+      el: '#app',
+      data: { //persisted data
+        name: null,
+        totalPts: 0,
+        rules: [],
+        comments: [],
+        //temporary gui state
+        selectedRules: [],
+        addNum: null,
+        addDesc: null,
+        plusFormActive: false
+      },
+      filters: {
+        positive: function(num) { //TODO make all caps
+          if (num > 0) return `+${num}`;
+          return num;
+        }
+      },
+      computed: {
+        actualPts: function() { //add up all selected pts and subtract from totalPts
+          return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
 
-      //   let sum = this.totalPts;
-      //   for (rule of this.selectedRules) {
-      //       sum += rule.pts;
-      //   }
-      //   return sum;
-    }
-  },
-  methods: {
-    removeRule: function(i) {
-      this.rules.splice(i,1);
-    },
-    addRule: function() {
-      if (!this.addNum)  return;
-      if (!this.addDesc) return;
-      this.rules.push({ pts: this.addNum, desc: this.addDesc });
-      this.addNum = null;
-      this.addDesc = null;
-      this.plusFormActive = false;
-    },
-	addComment: function(e) {
-		value = e.target.value;
-		this.comments.push({text: value});
-		e.target.value = '';
-	},
-	requestUpdate: function(myRef) {
-		this.comments.text[myRef] = this.$refs[myRef].innerText;
-		this.totalPoints[myRef] = this.$refs[myRef].innerText;
-		this.asName[myRef] = this.$refs[myRef].innerText;
-	},
-	clearComments: function() {
-		this.comments = [];
-	}
-  },
-  created: function () {
-    let self = this;
-    axios.get('lab1.json')
-      .then(function (response) {
-        self.name = response.data.name;
-        self.totalPts = response.data.totalPts;
-        self.rules = response.data.rules;
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    axios.post('/lab1') // post parameter is name of assignment to be saved
-      .then(function (response) {
-        
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-  }
-})
+          //   let sum = this.totalPts;
+          //   for (rule of this.selectedRules) {
+          //       sum += rule.pts;
+          //   }
+          //   return sum;
+        }
+      },
+      methods: {
+        removeRule: function(i) {
+          this.rules.splice(i, 1);
+        },
+        addRule: function() {
+          if (!this.addNum) return;
+          if (!this.addDesc) return;
+          this.rules.push({ pts: this.addNum, desc: this.addDesc });
+          this.addNum = null;
+          this.addDesc = null;
+          this.plusFormActive = false;
+        },
+        addComment: function(e) {
+          value = e.target.value;
+          this.comments.push({ user: 'admin', text: value });
+          e.target.value = '';
+        },
+        requestUpdate: function(myRef) {
+          this.comments.text[myRef] = this.$refs[myRef].innerText;
+          this.totalPoints(myRef) = this.$refs(myRef).innerText;
+          this.asName(myRef) = this.$refs(myRef).innerText;
+        },
+        clearComments: function() {
+          this.comments = [];
+        },
+        saveToServer: function() {
+          // Save/update Grader-Aide assignment to server
+          axios.post('/lab1', {
+              // sent object JSON
+              name: this.name,
+              totalPts: this.totalPts,
+              rules: this.rules,
+              comments: this.comments
+            }) // post parameter is name of assignment to be saved
+            .then(function(response) {
+              console.log(response);
+            })
+            .catch(function(error) {
+              console.log(error);
+            })
+        }
+      },
+      created: function() {
+        let self = this;
 
-//CLASS MILESTONE
-//REFACTOR prettify the text boxes, can we use regEx to filter what's allowed
-//REFACTOR the two output <div> sections into one
-//FIXME if rule is checked, and then deleted, it's still listed in summary
-//REFACTOR pop up the add line
+        // Get Grader-Aide assignment from server
+        axios.get('lab1.json')
+          .then(function(response) {
+            self.name = response.data.name;
+            self.totalPts = response.data.totalPts;
+            self.rules = response.data.rules;
+            self.comments = response.data.comments;
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
 
-//FUTURE
-//TODO partial credit
-//TODO late penalty percentage
-//TODO tie to Canvas API
+      }
+    })
 
-//TEAM MILESTONE
-//TODO save (storing the json) via axios (COMPLETE)
-//TODO recover/restore deleted rule in memory stack
-//TODO edit rule 
-//TODO edit name (COMPLETE)
-//TODO edit totalPts (COMPLETE)
-//TODO list of comments (no points up or down) (COMPLETE)
-//TODO edit list of comments (COMPLETE)
-//TODO delete list of comments/recovering (DELETE COMPLETE)
-//TODO create a new assignment
+    //CLASS MILESTONE
+    //REFACTOR prettify the text boxes, can we use regEx to filter what's allowed
+    //REFACTOR the two output <div> sections into one
+    //FIXME if rule is checked, and then deleted, it's still listed in summary
+    //REFACTOR pop up the add line
 
-</script>
+    //FUTURE
+    //TODO partial credit
+    //TODO late penalty percentage
+    //TODO tie to Canvas API
+
+    //TEAM MILESTONE
+    //TODO save (storing the json) via axios (COMPLETE)
+    //TODO recover/restore deleted rule in memory stack
+    //TODO edit rule 
+    //TODO edit name (COMPLETE)
+    //TODO edit totalPts (COMPLETE)
+    //TODO list of comments (no points up or down) (COMPLETE)
+    //TODO edit list of comments (COMPLETE)
+    //TODO delete list of comments/recovering (DELETE COMPLETE)
+    //TODO create a new assignment
+
+    //IN PROGRESS by Sam
+  </script>
 </body>
 
 </html>

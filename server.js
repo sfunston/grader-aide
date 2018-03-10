@@ -7,6 +7,7 @@ let compression = require('compression');
 let favicon = require('serve-favicon');
 let bodyParser = require('body-parser');
 let path = require('path');
+let fs = require('fs');
 
 //TODO security
 
@@ -42,7 +43,18 @@ app.use(express.static(`${__dirname}/client`));
 
 app.get('*', function(req, res) {
   res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`)
-  
+})
+
+app.post('/lab1', function(req, res) {
+    let callback;
+    let json = {
+        name: req.body.name,
+        totalPts: req.body.totalPts,
+        rules: req.body.rules,
+        comments: req.body.comments
+    }
+    fs.writeFile('lab1-test.json', JSON.stringify(json), 'utf8', callback);
+    res.status(200).send(`Successfully written file.`);
 })
 
 
