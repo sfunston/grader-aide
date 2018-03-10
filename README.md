@@ -1,25 +1,32 @@
-# grader-aide
+# README #
 
-## Getting Started
+### Team Milestone Checklist ###
 
-remember **Don't load html file using the file:// protocol**
-If you don't have node installed, follow these steps to get a server running locally.
+    [~] save (storing the json) via axios
+    [ ] recover/restore deleted rule in memory stack
+    [ ] edit rule
+    [x] edit name
+    [x] edit totalPts
+    [x] list of comments (no points up or down)
+    [x] edit list of comments (no points up or down)
+    [x] delete list of comments/recovering
+    [ ] create a new assignment
 
-1) clone the repo
-```
-git clone https://github.com/UVU-CS4690-2018/grader-aide.git
-```
+### Setting up Git ###
+    1. Install git if you haven't already - https://git-scm.com/download/win
 
-2) [install node](https://nodejs.org/en/)
+    2. Add repository
+    git remote add origin https://<username>@bitbucket.org/sfunston/grader-aide.git
 
-3) install dependencies
-```
-npm install
-```
+    3. Change to desired local src directory
+    cd /my/src/folder
 
-4) run the server
-```
-npm start
-```
+    4. Do initial pull to get files (same command for subsequent pulls)
+    git pull -u origin master
 
-## Built With Love By the CS4690 crew
+    For subsequent commits
+    git commit -m "Comment for this commit"
+    git push -u origin master
+    
+    To add a file to git for tracking:
+    git add <filename>
