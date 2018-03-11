@@ -141,7 +141,8 @@
         },
         saveToServer: function() {
           // Save/update Grader-Aide assignment to server
-          axios.post('/lab1', {
+          let filename = 'lab1';
+          axios.post(`/api/v1/assignments/${filename}`, {
               // sent object JSON
               name: this.name,
               totalPts: this.totalPts,
@@ -160,12 +161,14 @@
         let self = this;
 
         // Get Grader-Aide assignment from server
-        axios.get('lab1.json')
+        axios.get('/api/v1/assignments')
           .then(function(response) {
             self.name = response.data.name;
             self.totalPts = response.data.totalPts;
             self.rules = response.data.rules;
-            self.comments = response.data.comments;
+            if(response.data.comments != undefined) {
+              self.comments = response.data.comments;
+            }
           })
           .catch(function(error) {
             console.log(error);

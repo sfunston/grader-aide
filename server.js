@@ -15,7 +15,7 @@ let app = express();
 
 // express middleware
 app.use(logger('dev'));
-app.use(favicon(path.join(__dirname,'client','favicon.ico')));
+app.use(favicon(path.join(__dirname, 'client', 'favicon.ico')));
 
 //GET IT WORKING
 //3. how to get uvu's real favicon.ico?
@@ -33,28 +33,58 @@ app.use(favicon(path.join(__dirname,'client','favicon.ico')));
 
 app.use(compression());
 //for mime type application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 //for mime type application/json
 app.use(bodyParser.json());
 
 //TODO handle REST stuff
 
-app.use(express.static(`${__dirname}/client`)); 
+app.use(express.static(`${__dirname}/client`));
 
-app.get('*', function(req, res) {
-  res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`)
-})
+app.get('/api/v1/assignments', function(req, res) {
+    fs.readdir(`${__dirname}/client`, (err, files) => {
+        if (err) {
+            console.log('Could not read directory');
+        };
+        files.forEach(file => {
+            if (file.indexOf('.json') > -1) {
+                fs.readFile(`${__dirname}/client/${file}`, function(err, content) {
+                    res.writeHead(200, {
+                        'Content-Type': 'text/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Powered-By': 'nodejs'
+                    })
+                    if (err) {
+                        console.log(err);
+                    }
+                    res.write(content);
+                    res.end();
+                })
+            }
+        })
+    })
+});
 
-app.post('/lab1', function(req, res) {
-    let callback;
+app.post('/api/v1/assignments/:name', function(req, res) {
+    let filename = `${req.params.name}.json`;
     let json = {
-        name: req.body.name,
+        name: req.params.name,
         totalPts: req.body.totalPts,
         rules: req.body.rules,
         comments: req.body.comments
     }
-    fs.writeFile('lab1-test.json', JSON.stringify(json), 'utf8', callback);
-    res.status(200).send(`Successfully written file.`);
+
+    let callback;
+    fs.writeFile(`${__dirname}/client/${filename}`, JSON.stringify(json), 'utf8', (err) => {
+        if (err) {
+            res.status(500).send("Server could not save file.");
+        }
+        res.status(200).send("Server saved file successfully.");
+    });
+})
+
+app.get('*', function(req, res) {
+    res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`)
 })
 
 
