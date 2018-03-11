@@ -26,9 +26,9 @@
 
       <!-- title row -->
       <div class="col-xl-6 offset-xl-3">
-        <h1 contenteditable="true" ref="name" @blur="updateName('name')">{{name}}</h1>
+        <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
         <!-- TODO -->
-        <h4 contenteditable="true" ref="totalPoints" @blur="requestUpdate('totalPoints')">{{totalPts}}</h4>
+        <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
 
 
@@ -61,6 +61,7 @@
         </div>
 
         <!-- add comment -->
+        <br>
         <div>
           <h2>Comments</h2>
           <span v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">
@@ -125,14 +126,14 @@
           this.comments.push({ user: 'admin', text: value });
           e.target.value = '';
         },
-        updateComments: function(ref) {
-          this.comments.text[ref] = this.$refs[ref].innerText;
-        },
         requestUpdate: function(ref) {
-          this.totalPoints[ref] == this.$refs[ref].innerText;
-        },
-        updateName: function(ref) {
-          this.name = this.$refs[ref].innerText;
+          if (ref == 'name') {
+            this.name = this.$refs[ref].innerText;
+          } else if (ref == 'total_Pts') {
+            this.totalPts = this.$refs[ref].innerText;
+          } else if (ref == 'commentText') {
+            this.comments.text[ref] = this.$refs[ref].innerText;
+          }
         },
         clearComments: function() {
           this.comments = [];
@@ -198,7 +199,6 @@
     //TODO delete list of comments/recovering (DELETE COMPLETE)
     //TODO create a new assignment
 
-    //IN PROGRESS by Sam
   </script>
 </body>
 
