@@ -127,13 +127,9 @@
           e.target.value = '';
         },
         requestUpdate: function(ref) {
-          if (ref == 'name') {
-            this.name = this.$refs[ref].innerText;
-          } else if (ref == 'total_Pts') {
-            this.totalPts = this.$refs[ref].innerText;
-          } else if (ref == 'commentText') {
-            this.comments.text[ref] = this.$refs[ref].innerText;
-          }
+            this.name = this.$refs['name'].innerText;
+            this.totalPts = this.$refs['total_Pts'].innerText;
+            this.comments.text = this.$refs['commentText'].innerText;
         },
         clearComments: function() {
           this.comments = [];
