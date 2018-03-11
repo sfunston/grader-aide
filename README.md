@@ -2,7 +2,7 @@
 
 ### Team Milestone Checklist ###
 
-    [~] save (storing the json) via axios
+    [x] save (storing the json) via axios
     [ ] recover/restore deleted rule in memory stack
     [ ] edit rule
     [x] edit name

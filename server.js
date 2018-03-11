@@ -39,16 +39,17 @@ app.use(bodyParser.json());
 
 //TODO handle REST stuff
 
-app.use(express.static(`${__dirname}/client`));
+app.use(express.static(path.join(__dirname,'client')));
 
+// Load singular or all files
 app.get('/api/v1/assignments', function(req, res) {
-    fs.readdir(`${__dirname}/client`, (err, files) => {
+    fs.readdir(path.join(__dirname,'client'), (err, files) => {
         if (err) {
             console.log('Could not read directory');
         };
         files.forEach(file => {
             if (file.indexOf('.json') > -1) {
-                fs.readFile(`${__dirname}/client/${file}`, function(err, content) {
+                fs.readFile(path.join(__dirname,'client',file), function(err, content) {
                     res.writeHead(200, {
                         'Content-Type': 'text/json',
                         'Access-Control-Allow-Origin': '*',
@@ -65,17 +66,19 @@ app.get('/api/v1/assignments', function(req, res) {
     })
 });
 
+// Save single file
 app.post('/api/v1/assignments/:name', function(req, res) {
     let filename = `${req.params.name}.json`;
     let json = {
         name: req.params.name,
         totalPts: req.body.totalPts,
         rules: req.body.rules,
+        selectedRules: req.body.selectedRules,
         comments: req.body.comments
     }
 
     let callback;
-    fs.writeFile(`${__dirname}/client/${filename}`, JSON.stringify(json), 'utf8', (err) => {
+    fs.writeFile(path.join(__dirname,'client',filename), JSON.stringify(json), 'utf8', (err) => {
         if (err) {
             res.status(500).send("Server could not save file.");
         }

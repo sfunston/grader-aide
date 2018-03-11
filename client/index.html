@@ -147,6 +147,7 @@
               name: this.name,
               totalPts: this.totalPts,
               rules: this.rules,
+              selectedRules: this.selectedRules,
               comments: this.comments
             }) // post parameter is name of assignment to be saved
             .then(function(response) {
@@ -166,6 +167,7 @@
             self.name = response.data.name;
             self.totalPts = response.data.totalPts;
             self.rules = response.data.rules;
+            self.selectedRules = response.data.selectedRules;
             if(response.data.comments != undefined) {
               self.comments = response.data.comments;
             }
