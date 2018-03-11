@@ -41,14 +41,31 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname,'client')));
 
+app.get('/', function(req, res) {
+   
+   fs.readFile(path.join(__dirname,'client','index.html'), function(err, content) {
+       res.writeHead(200, {
+           'Content-Type': 'text/html'
+       })
+       if (err) {
+           console.log(err);
+       }
+       res.write(content);
+       res.end();
+   })
+    
+});
+
 // Load singular or all files
 app.get('/api/v1/assignments', function(req, res) {
     fs.readdir(path.join(__dirname,'client'), (err, files) => {
         if (err) {
             console.log('Could not read directory');
         };
+        
+        let found = false;
         files.forEach(file => {
-            if (file.indexOf('.json') > -1) {
+            if (file.indexOf('.json') > -1 && found == false) {
                 fs.readFile(path.join(__dirname,'client',file), function(err, content) {
                     res.writeHead(200, {
                         'Content-Type': 'text/json',
@@ -61,6 +78,7 @@ app.get('/api/v1/assignments', function(req, res) {
                     res.write(content);
                     res.end();
                 })
+                found = true;
             }
         })
     })
@@ -81,6 +99,7 @@ app.post('/api/v1/assignments/:name', function(req, res) {
     fs.writeFile(path.join(__dirname,'client',filename), JSON.stringify(json), 'utf8', (err) => {
         if (err) {
             res.status(500).send("Server could not save file.");
+            return;
         }
         res.status(200).send("Server saved file successfully.");
     });

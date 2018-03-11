@@ -26,7 +26,7 @@
 
       <!-- title row -->
       <div class="col-xl-6 offset-xl-3">
-        <h1 contenteditable="true" ref="asName" @blur="requestUpdate('asName')">{{name}}</h1>
+        <h1 contenteditable="true" ref="name" @blur="updateName('name')">{{name}}</h1>
         <!-- TODO -->
         <h4 contenteditable="true" ref="totalPoints" @blur="requestUpdate('totalPoints')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
@@ -72,7 +72,7 @@
           <br>
           <button @click="clearComments">Clear comments</button>
         </div>
-        
+
         <!-- save assignment -->
         <div>
           <button @click="saveToServer">Save</button>
@@ -105,13 +105,7 @@
       },
       computed: {
         actualPts: function() { //add up all selected pts and subtract from totalPts
-          return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
-
-          //   let sum = this.totalPts;
-          //   for (rule of this.selectedRules) {
-          //       sum += rule.pts;
-          //   }
-          //   return sum;
+          return this.selectedRules.reduce((acc, el) => parseInt(acc) + parseInt(el.pts), this.totalPts);
         }
       },
       methods: {
@@ -127,22 +121,25 @@
           this.plusFormActive = false;
         },
         addComment: function(e) {
-          value = e.target.value;
+          let value = e.target.value;
           this.comments.push({ user: 'admin', text: value });
           e.target.value = '';
         },
-        requestUpdate: function(myRef) {
-          this.comments.text[myRef] = this.$refs[myRef].innerText;
-          this.totalPoints(myRef) = this.$refs(myRef).innerText;
-          this.asName(myRef) = this.$refs(myRef).innerText;
+        updateComments: function(ref) {
+          this.comments.text[ref] = this.$refs[ref].innerText;
+        },
+        requestUpdate: function(ref) {
+          this.totalPoints[ref] == this.$refs[ref].innerText;
+        },
+        updateName: function(ref) {
+          this.name = this.$refs[ref].innerText;
         },
         clearComments: function() {
           this.comments = [];
         },
         saveToServer: function() {
           // Save/update Grader-Aide assignment to server
-          let filename = 'lab1';
-          axios.post(`/api/v1/assignments/${filename}`, {
+          axios.post(`/api/v1/assignments/${this.name}`, {
               // sent object JSON
               name: this.name,
               totalPts: this.totalPts,
@@ -168,7 +165,7 @@
             self.totalPts = response.data.totalPts;
             self.rules = response.data.rules;
             self.selectedRules = response.data.selectedRules;
-            if(response.data.comments != undefined) {
+            if (response.data.comments != undefined) {
               self.comments = response.data.comments;
             }
           })
