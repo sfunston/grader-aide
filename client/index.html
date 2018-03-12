@@ -13,6 +13,7 @@
     .removeButton {
       color: red;
     }
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
@@ -49,19 +50,17 @@
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <!-- TODO -->
-          <div v-if="!editFormActive">
-            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
-            <img src="img/pencilBlack.svg" class="clickable float-right" @click="editFormActive=true" title="Edit">
+          <div>
+            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> 
+            <span v-if="!isEditing">{{rule.pts | positive}} {{rule.desc}}</span>
+            
+            <!-- edit rules -->
+            <input type="text" name="points" class="col-xl-1" v-model="rule.pts" :value="rule.pts" v-if="isEditing" @keyup.enter="editRule">
+            <input type="text" name="desc" class="col-xl-10" v-model="rule.desc" :value="rule.desc" v-if="isEditing" @keyup.enter="editRule">
+            
+            <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
             <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
           </div>
-
-          <!-- edit form -->
-          <div v-if="editFormActive">
-            <input type="text" class="col-xl-2" :value="rule.pts | positive" @keyup.enter="editRule">
-            <input type="text" class="col-xl-9" :value="rule.desc" @keyup.enter="editRule">
-          </div>
-          <br>
-          </input>
         </div>
 
         <!-- add row -->
@@ -127,7 +126,7 @@
         addNum: null,
         addDesc: null,
         plusFormActive: false,
-        editFormActive: false
+        isEditing: false
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -147,7 +146,7 @@
         addRule: function() {
           if (!this.addNum) return;
           if (!this.addDesc) return;
-          this.rules.push({ pts: this.addNum, desc: this.addDesc });
+          this.rules.push({ pts: this.addNum, desc: this.addDesc, edit: false });
           this.addNum = null;
           this.addDesc = null;
           this.plusFormActive = false;
@@ -163,8 +162,10 @@
           this.comments.text = this.$refs['commentText'].innerText;
         },
         editRule: function() {
-          //TODO change rules.pts and rules.desc to reflect the input value
-          this.editFormActive = false;
+          this.isEditing = false;
+        },
+        enableEdit: function(i) {
+          this.isEditing = true;
         },
         clearComments: function() {
           this.comments = [];
