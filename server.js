@@ -39,50 +39,48 @@ app.use(bodyParser.json());
 
 //TODO handle REST stuff
 
-app.use(express.static(path.join(__dirname,'client')));
+app.use(express.static(path.join(__dirname, 'client')));
 
-app.get('/', function(req, res) {
-   
-   fs.readFile(path.join(__dirname,'client','index.html'), function(err, content) {
-       res.writeHead(200, {
-           'Content-Type': 'text/html'
-       })
-       if (err) {
-           console.log(err);
-       }
-       res.write(content);
-       res.end();
-   })
+// Load list of assignments
+app.get('/api/v1/assignments', function(req, res) {
+    fs.readdir(path.join(__dirname, 'client', 'assignments'), (err, files) => {
+        if (err) {
+            res.status(500).send('Server could not read assignments directory.');
+        }
+        
+        let fileList = {assignments: []};
+        files.forEach(file => {
+            if (file.indexOf('.json') > -1) {
+                fileList.assignments.push(path.basename(file,'.json'));
+            }
+        });
+
+        res.status(200).send(JSON.stringify(fileList));
+        
+    });
     
 });
 
-// Load singular or all files
-app.get('/api/v1/assignments', function(req, res) {
-    fs.readdir(path.join(__dirname,'client'), (err, files) => {
-        if (err) {
-            console.log('Could not read directory');
-        };
-        
-        let found = false;
-        files.forEach(file => {
-            if (file.indexOf('.json') > -1 && found == false) {
-                fs.readFile(path.join(__dirname,'client',file), function(err, content) {
-                    res.writeHead(200, {
-                        'Content-Type': 'text/json',
-                        'Access-Control-Allow-Origin': '*',
-                        'X-Powered-By': 'nodejs'
-                    })
-                    if (err) {
-                        console.log(err);
-                    }
-                    res.write(content);
-                    res.end();
-                })
-                found = true;
+app.get('/api/v1/assignments/:name', function(req, res) {
+    if (req.params.name != 'null') {
+        fs.readFile(path.join(__dirname, 'client', 'assignments', `${req.params.name}.json`), function(err, content) {
+            res.writeHead(200, {
+                'Content-Type': 'text/json',
+                'Access-Control-Allow-Origin': '*',
+                'X-Powered-By': 'nodejs'
+            });
+            if (err) {
+                console.log(err);
             }
-        })
-    })
-});
+            res.write(content);
+            res.end();
+        });
+
+    } else {
+        res.status(404).send('Requested assignment does not exist!');
+    }
+
+})
 
 // Save single file
 app.post('/api/v1/assignments/:name', function(req, res) {
@@ -93,21 +91,20 @@ app.post('/api/v1/assignments/:name', function(req, res) {
         rules: req.body.rules,
         selectedRules: req.body.selectedRules,
         comments: req.body.comments
-    }
+    };
 
-    let callback;
-    fs.writeFile(path.join(__dirname,'client',filename), JSON.stringify(json), 'utf8', (err) => {
+    fs.writeFile(path.join(__dirname, 'client', 'assignments', filename), JSON.stringify(json), 'utf8', (err) => {
         if (err) {
             res.status(500).send("Server could not save file.");
             return;
         }
         res.status(200).send("Server saved file successfully.");
     });
-})
+});
 
 app.get('*', function(req, res) {
-    res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`)
-})
+    res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`);
+});
 
 
 app.listen(8080);

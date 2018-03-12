@@ -24,23 +24,35 @@
   <div class="container" id="app">
     <div class="row">
 
-      <!-- title row -->
-      <div class="col-xl-6 offset-xl-3">
+      <!-- sidebar -->
+      <div class="col-2">
+
+        <h4>Assignments</h4>
+        <ul>
+          <div v-for="(assn, i) of assignments">
+            <li class="clickable" @click="selectAssignment(assn)">{{assn}}</li>
+          </div>
+        </ul>
+
+      </div>
+
+      <!-- main content area -->
+      <div class="col-10">
+
+        <!-- assignment title -->
         <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
         <!-- TODO -->
         <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
-			<br>
+        <br>
 
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <!-- TODO -->
           <div v-if="!editFormActive">
-            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            {{rule.pts | positive}}
-            {{rule.desc}}
-          <img src="img/pencilBlack.svg" class="clickable float-right" @click="editFormActive=true" title="Edit">
-          <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
+            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
+            <img src="img/pencilBlack.svg" class="clickable float-right" @click="editFormActive=true" title="Edit">
+            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
           </div>
 
           <!-- edit form -->
@@ -68,26 +80,33 @@
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
           <b>Good Job</b>
           <hr> {{actualPts}}
+          <br>
         </div>
 
-        <!-- add comment -->
-        <br>
+        <!-- comment area -->
         <div>
           <h2>Comments</h2>
           <span v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">
-					{{comment.text}}<br>
+					{{comment.text}}
+					<br>
 				</span>
-        </div>
-        <div>
-          <textarea id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
-          <br>
-          <button @click="clearComments">Clear comments</button>
+          <!-- new comment -->
+          <div>
+            <textarea style="width: 100%" id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
+            <br>
+          </div>
         </div>
 
-        <!-- save assignment -->
+        <!-- action buttons -->
         <div>
-          <button @click="saveToServer">Save</button>
+          <!-- clear comments -->
+          <button class="btn btn-warning" @click="clearComments">Clear comments</button>
+          <!-- save assignment -->
+          <button class="btn btn-info" @click="saveToServer">Save</button>
         </div>
+
+
+
       </div>
     </div>
   </div>
@@ -98,6 +117,7 @@
     let app = new Vue({
       el: '#app',
       data: { //persisted data
+        assignments: [],
         name: null,
         totalPts: 0,
         rules: [],
@@ -107,7 +127,7 @@
         addNum: null,
         addDesc: null,
         plusFormActive: false,
-		  editFormActive: false
+        editFormActive: false
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -138,19 +158,37 @@
           e.target.value = '';
         },
         requestUpdate: function(ref) {
-            this.name = this.$refs['name'].innerText;
-            this.totalPts = this.$refs['total_Pts'].innerText;
-            this.comments.text = this.$refs['commentText'].innerText;
+          this.name = this.$refs['name'].innerText;
+          this.totalPts = this.$refs['total_Pts'].innerText;
+          this.comments.text = this.$refs['commentText'].innerText;
         },
-		  editRule: function() {
-            //TODO change rules.pts and rules.desc to reflect the input value
-            this.editFormActive = false;
-          
+        editRule: function() {
+          //TODO change rules.pts and rules.desc to reflect the input value
+          this.editFormActive = false;
         },
         clearComments: function() {
           this.comments = [];
         },
+        selectAssignment: function(assn) {
+          let self = this;
+          // Get Grader-Aide assignment from server -- THIS SHOULD ONLY BE CALLED ONCE USER HAS SELECTED AN ASSIGNMENT FROM THE MENU. FUNCTION TO COME.
+          axios.get(`/api/v1/assignments/${assn}`)
+            .then(function(response) {
+              self.name = assn; // response.data.name; // won't need to set this if it's already set from user selecting an assignment
+              self.totalPts = response.data.totalPts;
+              self.rules = response.data.rules;
+              self.selectedRules = response.data.selectedRules;
+              if (response.data.comments != undefined) {
+                self.comments = response.data.comments;
+              }
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        },
         saveToServer: function() {
+          let self = this;
+
           // Save/update Grader-Aide assignment to server
           axios.post(`/api/v1/assignments/${this.name}`, {
               // sent object JSON
@@ -162,30 +200,29 @@
             }) // post parameter is name of assignment to be saved
             .then(function(response) {
               console.log(response);
+              self.refreshAssignments();
             })
             .catch(function(error) {
               console.log(error);
+            });
+
+        },
+        refreshAssignments: function() {
+          let self = this;
+          // Refresh assignments list
+          axios.get('/api/v1/assignments')
+            .then(function(response) {
+              self.assignments = response.data.assignments;
             })
+            .catch(function(error) {
+              console.log(error);
+            });
         }
       },
       created: function() {
         let self = this;
 
-        // Get Grader-Aide assignment from server
-        axios.get('/api/v1/assignments')
-          .then(function(response) {
-            self.name = response.data.name;
-            self.totalPts = response.data.totalPts;
-            self.rules = response.data.rules;
-            self.selectedRules = response.data.selectedRules;
-            if (response.data.comments != undefined) {
-              self.comments = response.data.comments;
-            }
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
-
+        self.refreshAssignments();
       }
     })
 
@@ -210,7 +247,6 @@
     //TODO edit list of comments (COMPLETE)
     //TODO delete list of comments/recovering (DELETE COMPLETE)
     //TODO create a new assignment
-
   </script>
 </body>
 
