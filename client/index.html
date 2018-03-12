@@ -55,8 +55,8 @@
             <span v-if="!isEditing">{{rule.pts | positive}} {{rule.desc}}</span>
             
             <!-- edit rules -->
-            <input type="text" name="points" class="col-xl-1" v-model="rule.pts" :value="rule.pts" v-if="isEditing" @keyup.enter="editRule">
-            <input type="text" name="desc" class="col-xl-10" v-model="rule.desc" :value="rule.desc" v-if="isEditing" @keyup.enter="editRule">
+            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing" @keyup.enter="editRule()">
+            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing" @keyup.enter="editRule()">
             
             <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
             <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">

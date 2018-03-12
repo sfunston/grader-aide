@@ -4,7 +4,7 @@
 
     [x] save (storing the json) via axios
     [ ] recover/restore deleted rule in memory stack
-    [ ] edit rule
+    [x] edit rule
     [x] edit name
     [x] edit totalPts
     [x] list of comments (no points up or down)
