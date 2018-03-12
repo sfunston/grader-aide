@@ -30,14 +30,24 @@
         <!-- TODO -->
         <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
-
+			<br>
 
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <!-- TODO -->
-          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
-          <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+          <div v-if="!editFormActive">
+            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+            {{rule.pts | positive}}
+            {{rule.desc}}
+          <img src="img/pencilBlack.svg" class="clickable float-right" @click="editFormActive=true" title="Edit">
           <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
+          </div>
+
+          <!-- edit form -->
+          <div v-if="editFormActive">
+            <input type="text" class="col-xl-2" :value="rule.pts | positive" @keyup.enter="editRule">
+            <input type="text" class="col-xl-9" :value="rule.desc" @keyup.enter="editRule">
+          </div>
           <br>
           </input>
         </div>
@@ -96,7 +106,8 @@
         selectedRules: [],
         addNum: null,
         addDesc: null,
-        plusFormActive: false
+        plusFormActive: false,
+		  editFormActive: false
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -130,6 +141,11 @@
             this.name = this.$refs['name'].innerText;
             this.totalPts = this.$refs['total_Pts'].innerText;
             this.comments.text = this.$refs['commentText'].innerText;
+        },
+		  editRule: function() {
+            //TODO change rules.pts and rules.desc to reflect the input value
+            this.editFormActive = false;
+          
         },
         clearComments: function() {
           this.comments = [];
