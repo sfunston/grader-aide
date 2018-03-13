@@ -56,8 +56,8 @@
             <span v-if="!isEditing">{{rule.pts | positive}} {{rule.desc}}</span>
             
             <!-- edit rules -->
-            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing" @keyup.enter="editRule()">
-            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing" @keyup.enter="editRule()">
+            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing" @keyup.enter="disableEdit()">
+            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing" @keyup.enter="disableEdit()">
             
             <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
             <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
@@ -164,7 +164,7 @@
           this.totalPts = this.$refs['total_Pts'].innerText;
           this.comments.text = this.$refs['commentText'].innerText;
         },
-        editRule: function() {
+        disableEdit: function() {
           this.isEditing = false;
         },
         enableEdit: function(i) {
