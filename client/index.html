@@ -146,7 +146,7 @@
         addRule: function() {
           if (!this.addNum) return;
           if (!this.addDesc) return;
-          this.rules.push({ pts: this.addNum, desc: this.addDesc, edit: false });
+          this.rules.push({ pts: this.addNum, desc: this.addDesc });
           this.addNum = null;
           this.addDesc = null;
           this.plusFormActive = false;
