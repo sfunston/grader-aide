@@ -45,6 +45,7 @@
         <!-- TODO -->
         <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+		  <div><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
         <br>
 
         <!-- rules rows -->
@@ -121,6 +122,7 @@
         totalPts: 0,
         rules: [],
         comments: [],
+		  ruleHistory: [],
         //temporary gui state
         selectedRules: [],
         addNum: null,
@@ -141,6 +143,7 @@
       },
       methods: {
         removeRule: function(i) {
+			 this.ruleHistory.push(this.rules[i]);
           this.rules.splice(i, 1);
         },
         addRule: function() {
@@ -170,6 +173,9 @@
         clearComments: function() {
           this.comments = [];
         },
+		  undo: function() {
+		    this.rules.push(this.ruleHistory.pop());
+		  },
         selectAssignment: function(assn) {
           let self = this;
           // Get Grader-Aide assignment from server -- THIS SHOULD ONLY BE CALLED ONCE USER HAS SELECTED AN ASSIGNMENT FROM THE MENU. FUNCTION TO COME.
