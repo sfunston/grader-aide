@@ -13,7 +13,6 @@
     .removeButton {
       color: red;
     }
-    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
@@ -44,21 +43,25 @@
         <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
         <!-- TODO -->
         <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
-        <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
-		  <div><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
-        <br>
+
+        <div class="row">
+          <div class="col-6"><img v-if="!plusFormActive" src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Open Add Fields"></div>
+          <div class="col-6"><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
+        </div>
 
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <!-- TODO -->
           <div>
-            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> 
-            <span v-if="!isEditing">{{rule.pts | positive}} {{rule.desc}}</span>
-            
-            <!-- edit rules -->
-            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing" @keyup.enter="disableEdit()">
-            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing" @keyup.enter="disableEdit()">
-            
+            <!-- rule display fields -->
+            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+            <span v-if="isEditing!=i">{{rule.pts | positive}} {{rule.desc}}</span>
+
+            <!-- rule edit fields -->
+            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing==i" @keyup.enter="disableEdit(i)">
+            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing==i" @keyup.enter="disableEdit(i)">
+
+            <!-- rule actions -->
             <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
             <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
           </div>
@@ -66,9 +69,12 @@
 
         <!-- add row -->
         <div v-if="plusFormActive">
-          <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()" title="pts (positive or negative)">
-          <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-          <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
+          <div class="row">
+            <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()" placeholder="0" title="pts (positive or negative)">
+            <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
+            <button class="col-xl-1 btn btn-sm btn-info btn-block" @click="addRule()" title="Add">Add</button>
+          </div>
+          <br>
         </div>
 
         <!-- output rows -->
@@ -99,6 +105,7 @@
 
         <!-- action buttons -->
         <div>
+          <br>
           <!-- clear comments -->
           <button class="btn btn-warning" @click="clearComments">Clear comments</button>
           <!-- save assignment -->
@@ -122,13 +129,13 @@
         totalPts: 0,
         rules: [],
         comments: [],
-		  ruleHistory: [],
+        ruleHistory: [],
         //temporary gui state
         selectedRules: [],
         addNum: null,
         addDesc: null,
         plusFormActive: false,
-        isEditing: false
+        isEditing: -1
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -143,7 +150,7 @@
       },
       methods: {
         removeRule: function(i) {
-			 this.ruleHistory.push(this.rules[i]);
+          this.ruleHistory.push(this.rules[i]);
           this.rules.splice(i, 1);
         },
         addRule: function() {
@@ -164,18 +171,20 @@
           this.totalPts = this.$refs['total_Pts'].innerText;
           this.comments.text = this.$refs['commentText'].innerText;
         },
-        disableEdit: function() {
-          this.isEditing = false;
-        },
         enableEdit: function(i) {
-          this.isEditing = true;
+          this.isEditing = i;
+        },
+        disableEdit: function(i) {
+          this.isEditing = -1;
         },
         clearComments: function() {
           this.comments = [];
         },
-		  undo: function() {
-		    this.rules.push(this.ruleHistory.pop());
-		  },
+        undo: function() {
+          if (this.ruleHistory[this.ruleHistory.length - 1] != undefined) { // Make sure that there is a rule to undo, otherwise app throws ugly error
+            this.rules.push(this.ruleHistory.pop());
+          }
+        },
         selectAssignment: function(assn) {
           let self = this;
           // Get Grader-Aide assignment from server -- THIS SHOULD ONLY BE CALLED ONCE USER HAS SELECTED AN ASSIGNMENT FROM THE MENU. FUNCTION TO COME.
@@ -228,6 +237,14 @@
       },
       created: function() {
         let self = this;
+
+        // Default values
+        self.name = "[Select an assignment]";
+        self.totalPts = 0;
+        self.rules = [];
+        self.selectedRules = [];
+        self.comments = [];
+
 
         self.refreshAssignments();
       }
