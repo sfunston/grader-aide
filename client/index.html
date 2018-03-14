@@ -13,6 +13,7 @@
     .removeButton {
       color: red;
     }
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
@@ -44,24 +45,23 @@
         <!-- TODO -->
         <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
         <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+		  <div><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
         <br>
 
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <!-- TODO -->
-          <div v-if="!editFormActive">
-            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
-            <img src="img/pencilBlack.svg" class="clickable float-right" @click="editFormActive=true" title="Edit">
+          <div>
+            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> 
+            <span v-if="!isEditing">{{rule.pts | positive}} {{rule.desc}}</span>
+            
+            <!-- edit rules -->
+            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing" @keyup.enter="disableEdit()">
+            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing" @keyup.enter="disableEdit()">
+            
+            <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
             <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
           </div>
-
-          <!-- edit form -->
-          <div v-if="editFormActive">
-            <input type="text" class="col-xl-2" :value="rule.pts | positive" @keyup.enter="editRule">
-            <input type="text" class="col-xl-9" :value="rule.desc" @keyup.enter="editRule">
-          </div>
-          <br>
-          </input>
         </div>
 
         <!-- add row -->
@@ -122,12 +122,13 @@
         totalPts: 0,
         rules: [],
         comments: [],
+		  ruleHistory: [],
         //temporary gui state
         selectedRules: [],
         addNum: null,
         addDesc: null,
         plusFormActive: false,
-        editFormActive: false
+        isEditing: false
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -142,6 +143,7 @@
       },
       methods: {
         removeRule: function(i) {
+			 this.ruleHistory.push(this.rules[i]);
           this.rules.splice(i, 1);
         },
         addRule: function() {
@@ -162,13 +164,18 @@
           this.totalPts = this.$refs['total_Pts'].innerText;
           this.comments.text = this.$refs['commentText'].innerText;
         },
-        editRule: function() {
-          //TODO change rules.pts and rules.desc to reflect the input value
-          this.editFormActive = false;
+        disableEdit: function() {
+          this.isEditing = false;
+        },
+        enableEdit: function(i) {
+          this.isEditing = true;
         },
         clearComments: function() {
           this.comments = [];
         },
+		  undo: function() {
+		    this.rules.push(this.ruleHistory.pop());
+		  },
         selectAssignment: function(assn) {
           let self = this;
           // Get Grader-Aide assignment from server -- THIS SHOULD ONLY BE CALLED ONCE USER HAS SELECTED AN ASSIGNMENT FROM THE MENU. FUNCTION TO COME.

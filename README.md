@@ -3,8 +3,8 @@
 ### Team Milestone Checklist ###
 
     [x] save (storing the json) via axios
-    [ ] recover/restore deleted rule in memory stack
-    [ ] edit rule
+    [x] recover/restore deleted rule in memory stack
+    [x] edit rule
     [x] edit name
     [x] edit totalPts
     [x] list of comments (no points up or down)
