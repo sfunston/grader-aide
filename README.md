@@ -16,7 +16,7 @@
     1. Install git if you haven't already - https://git-scm.com/download/win
 
     2. Add repository
-    git remote add origin https://<username>@bitbucket.org/sfunston/grader-aide.git
+    git remote add origin https://github.com/sfunston/grader-aide.git
 
     3. Change to desired local src directory
     cd /my/src/folder
