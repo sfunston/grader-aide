@@ -10,7 +10,7 @@
     [x] list of comments (no points up or down)
     [x] edit list of comments (no points up or down)
     [x] delete list of comments/recovering
-    [ ] create a new assignment
+    [x] create a new assignment
 
 ### Setting up Git ###
     1. Install git if you haven't already - https://git-scm.com/download/win

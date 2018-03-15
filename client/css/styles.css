@@ -1,4 +1,95 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Raleway');
+
+h1 {
+    font-family: 'Raleway';
+}
+
+body {
+    font-family: 'Open Sans';
+}
+
+.assn {
+    list-style-image: url('/img/clippy.svg');
+}
+
+.assn-new {
+    list-style-image: url('/img/plus.svg');
+}
+
+.container {
+    height: 100%;
+}
+
 .input-group {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.removeButton {
+    color: red;
+}
+
+.margin-bot {
+    margin-bottom: 16px;
+}
+
+.margin-top-sm {
+    margin-top: 4px;
+}
+
+.no-margin-bot {
+    margin-bottom: 0;
+}
+
+.padding-top {
+    padding-top: 16px;
+}
+
+.dropshadow-far {
+    box-shadow: 0 0 10px grey;
+}
+
+.dropshadow-near {
+    box-shadow: 0 0 2px grey;
+}
+
+.uvu-color {
+    color: white;
+    background: #275D38;
+}
+
+.body-color {
+    background: white;
+}
+
+.body-padding {
+    padding: 20px;
+}
+
+.card-header {
+    padding: 0;
+    padding-top: .5rem;
+}
+
+.card-body {
+    padding: 0; /* reset */
+    padding-top: 1rem;
+}
+
+.profile-img {
+    border-radius: 12px;
+    border: 2px white solid;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-text {
+    vertical-align:middle; 
+    text-align:right; 
+    margin: 4px 16px
 }

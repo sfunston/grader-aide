@@ -5,15 +5,7 @@
   <meta charset="UTF-8">
   <title>GraderAide</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <style>
-    .clickable {
-      cursor: pointer;
-    }
-
-    .removeButton {
-      color: red;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/styles.css">
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
   <!-- TODO -->
@@ -21,29 +13,64 @@
 </head>
 
 <body>
-  <div class="container" id="app">
+  <div class="container-fluid uvu-color dropshadow-near">
+    <div class="container">
+      <div class="row">
+        <div class="col-6">
+          <h3 class="no-margin-bot">GraderAide</h3>
+        </div>
+        <div class="col-6">
+          <img class="float-right profile-img margin-top-sm" height=24 width=24 src="https://parkerhill.me/wp-content/uploads/2017/03/17270234_10155060248629501_567641921_n-e1489522777655.jpg">
+          <h5 class="float-right profile-text">Joe Shmoe</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container padding-top body-color dropshadow-near" id="app">
     <div class="row">
 
       <!-- sidebar -->
-      <div class="col-2">
+      <div class="col-3">
+        <div class="accordion">
+          <div class="card text-secondary">
+            <div class="card-header" id="headingOne">
+              <h4>
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  Assignments
+                </button>
+              </h4>
+            </div>
 
-        <h4>Assignments</h4>
-        <ul>
-          <div v-for="(assn, i) of assignments">
-            <li class="clickable" @click="selectAssignment(assn)">{{assn}}</li>
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+              <div class="card-body">
+                <ul>
+                  <li v-for="(assn, i) of assignments" class="clickable assn" @click="selectAssignment(assn)">{{assn}}</li>
+                  <li class="clickable assn-new" @click="addAssignment()">New</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
-        </ul>
+        </div>
 
       </div>
 
       <!-- main content area -->
-      <div class="col-10">
+      <div class="col-9">
 
-        <!-- assignment title -->
-        <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
-        <!-- TODO -->
-        <h4 contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</h4>
+        <div class="row">
+          <div class="col-8">
+            <!-- assignment title -->
+            <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
+          </div>
+          <div class="col-4">
+            <h4 class="float-right" style="vertical-align:bottom">Possible: <span contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</span></h4>
+          </div>
+        </div>
 
+        <br>
+
+        <h4>Rules</h4>
         <div class="row">
           <div class="col-6"><img v-if="!plusFormActive" src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Open Add Fields"></div>
           <div class="col-6"><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
@@ -67,6 +94,8 @@
           </div>
         </div>
 
+        <br>
+
         <!-- add row -->
         <div v-if="plusFormActive">
           <div class="row">
@@ -74,45 +103,55 @@
             <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
             <button class="col-xl-1 btn btn-sm btn-info btn-block" @click="addRule()" title="Add">Add</button>
           </div>
-          <br>
         </div>
 
+        <br>
+
         <!-- output rows -->
+        <h4>Calculated</h4>
         <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <hr> {{actualPts}}
+          <hr>
+          <h3>{{actualPts}}</h3>
         </div>
         <div v-else class="alert alert-success" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
           <b>Good Job</b>
-          <hr> {{actualPts}}
+          <hr>
+          <h3>{{actualPts}}</h3>
           <br>
         </div>
+
+        <br>
 
         <!-- comment area -->
         <div>
-          <h2>Comments</h2>
-          <span v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">
-					{{comment.text}}
-					<br>
-				</span>
+          <h4>Comments</h4>
+          <p v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">{{comment.text}}</p>
           <!-- new comment -->
-          <div>
-            <textarea style="width: 100%" id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
-            <br>
+          <textarea class="margin-bot" style="width: 100%" id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
+          <!-- comment actions -->
+          <div class="row">
+
+            <div class="col-12">
+              <!-- clear comments -->
+              <button class="btn btn-warning" @click="clearComments">Clear comments</button>
+            </div>
+
           </div>
         </div>
 
-        <!-- action buttons -->
-        <div>
-          <br>
-          <!-- clear comments -->
-          <button class="btn btn-warning" @click="clearComments">Clear comments</button>
-          <!-- save assignment -->
-          <button class="btn btn-info" @click="saveToServer">Save</button>
+        <!-- assignment-wide actions -->
+        <div class="row margin-bot">
+          <div class="col-12">
+            <!-- save assignment -->
+            <button class="btn btn-info float-right" @click="saveToServer">Save</button>
+          </div>
+
         </div>
 
-
+        <!-- NEEDS REFACTORING - placeholder empty space to fill bottom of the page -->
+        <div style="height:250px"></div>
 
       </div>
     </div>
@@ -169,7 +208,9 @@
         requestUpdate: function(ref) {
           this.name = this.$refs['name'].innerText;
           this.totalPts = this.$refs['total_Pts'].innerText;
-          this.comments.text = this.$refs['commentText'].innerText;
+          if (this.comments.text != undefined) {
+            this.comments.text = this.$refs['commentText'].innerText;
+          }
         },
         enableEdit: function(i) {
           this.isEditing = i;
@@ -184,6 +225,15 @@
           if (this.ruleHistory[this.ruleHistory.length - 1] != undefined) { // Make sure that there is a rule to undo, otherwise app throws ugly error
             this.rules.push(this.ruleHistory.pop());
           }
+        },
+        addAssignment: function() {
+          let self = this;
+
+          self.name = 'Untitled';
+          self.totalPts = 0;
+          self.rules = [];
+          self.selectedRules = [];
+          self.comments = [];
         },
         selectAssignment: function(assn) {
           let self = this;
@@ -239,11 +289,34 @@
         let self = this;
 
         // Default values
+        /*
         self.name = "[Select an assignment]";
         self.totalPts = 0;
         self.rules = [];
         self.selectedRules = [];
-        self.comments = [];
+        self.comments = [];*/
+
+        // Try to load first assignment from server
+        axios.get('/api/v1/assignments/default')
+          .then(function(response) {
+            console.log(response);
+            self.name = response.data.name;
+            self.totalPts = response.data.totalPts;
+            self.rules = response.data.rules;
+            if (response.data.selectedRules != undefined) {
+              self.selectedRules = response.data.selectedRules;
+            }
+            else {
+              self.selectedRules = [];
+            }
+
+            if (response.data.comments != undefined) {
+              self.comments = response.data.comments;
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
 
 
         self.refreshAssignments();

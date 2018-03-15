@@ -61,6 +61,36 @@ app.get('/api/v1/assignments', function(req, res) {
     
 });
 
+app.get('/api/v1/assignments/default', function(req, res) {
+    fs.readdir(path.join(__dirname, 'client', 'assignments'), (err, files) => {
+        if (err) {
+            res.status(500).send('Server could not read assignments directory.');
+        }
+        
+        let fileList = {assignments: []};
+        files.forEach(file => {
+            if (file.indexOf('.json') > -1) {
+                fileList.assignments.push(file);
+            }
+        });
+        
+        // Get the first file
+        fs.readFile(path.join(__dirname, 'client', 'assignments', fileList.assignments[0]), function(err, content) {
+            res.writeHead(200, {
+                'Content-Type': 'text/json',
+                'Access-Control-Allow-Origin': '*',
+                'X-Powered-By': 'nodejs'
+            });
+            if (err) {
+                console.log(err);
+            }
+            res.write(content);
+            res.end();
+        });
+        
+    });
+});
+
 app.get('/api/v1/assignments/:name', function(req, res) {
     if (req.params.name != 'null') {
         fs.readFile(path.join(__dirname, 'client', 'assignments', `${req.params.name}.json`), function(err, content) {
