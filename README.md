@@ -3,6 +3,36 @@
 ### REST Contract ###
 https://goo.gl/Y846mt
 
+### Final Project ###
+    Client
+    [] Vue routing
+    [] Copy assignment (clipboard.js)
+    [] Testing (selenium)
+    [] Authentication
+    [] Student view and Grader View
+    [] Grader must be able to add, delete, change, and list assignments in course
+    
+    Server
+    [] Testing
+          - positive and negative test
+          - Mocha + Chai (+ Sinon TBD)
+          - Must test REST (supertest)
+    [] MongoDB running in a Docker container
+    [] Routers used by app.js
+          - router serving files from public
+          - router serving course REST via Mongo collections
+          - router serving assignment REST via Mongo Documents within a collection
+    [] Security
+    [] Authentication, how is up to you
+    [] Vue CLI/single page components
+
+    Repo
+    [] Github
+          - all code
+          - readme with example code and/or usage
+
+    All assigned two weeks before the semester ends!
+
 ### Team Milestone Checklist ###
 
     [x] save (storing the json) via axios
