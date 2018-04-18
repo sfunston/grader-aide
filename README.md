@@ -6,7 +6,7 @@ https://goo.gl/Y846mt
 ### Final Project ###
     Client
     [] Vue routing
-    [] Copy assignment comments(clipboard.js)
+    [x] Copy assignment comments(clipboard.js)
     [] Testing (selenium)
     [] Authentication
     [] Student view and Grader View

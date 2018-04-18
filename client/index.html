@@ -8,8 +8,8 @@
   <link rel="stylesheet" href="/css/styles.css">
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
-  <!-- TODO -->
   <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
 </head>
 
 <body>
@@ -127,7 +127,7 @@
         <!-- comment area -->
         <div>
           <h4>Comments</h4>
-          <p v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">{{comment.text}}</p>
+          <p id="copyText" v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">{{comment.text}}</p>
           <!-- new comment -->
           <textarea class="margin-bot" style="width: 100%" id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
           <!-- comment actions -->
@@ -136,6 +136,7 @@
             <div class="col-12">
               <!-- clear comments -->
               <button class="btn btn-warning" @click="clearComments">Clear comments</button>
+              <button class="btn btn" data-clipboard-target="#copyText">Copy Comments</button>
             </div>
 
           </div>
@@ -145,7 +146,7 @@
         <div class="row margin-bot">
           <div class="col-12">
             <!-- save assignment -->
-            <button class="btn btn-info float-right" @click="saveToServer">Save</button>
+            <button class="btn btn-info float-right" @click="saveToServer">Save Assignment</button>
           </div>
 
         </div>
@@ -160,6 +161,9 @@
   <script>
     /* global axios */
     /* global Vue */
+    /* global ClipboardJS */
+    
+    var clipboard = new ClipboardJS('.btn');
     let app = new Vue({
       el: '#app',
       data: { //persisted data
