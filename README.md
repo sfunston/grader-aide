@@ -31,8 +31,6 @@ https://goo.gl/Y846mt
           - all code
           - readme with example code and/or usage
 
-    All assigned two weeks before the semester ends!
-
 ### Team Milestone Checklist ###
 
     [x] save (storing the json) via axios
