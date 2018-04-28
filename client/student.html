@@ -26,7 +26,7 @@
       </div>
     </div>
   </div>
-    <a href="index.html">Go to grader view</a>
+    <a href="grader.html">Go to grader view</a>
   <div class="container padding-top body-color dropshadow-near" id="app">
     <div class="row">
 
@@ -232,7 +232,6 @@
       },
       created: function() {
         let self = this;
-
 
         // Try to load first assignment from server
         axios.get('/api/v1/assignments/default')
