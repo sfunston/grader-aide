@@ -26,7 +26,7 @@
       </div>
     </div>
   </div>
-  <a href="student.html">Go to student view</a>
+    <a href="index.html">Go to grader view</a>
   <div class="container padding-top body-color dropshadow-near" id="app">
     <div class="row">
 
@@ -46,7 +46,6 @@
               <div class="card-body">
                 <ul>
                   <li v-for="(assn, i) of assignments" class="clickable assn" @click="selectAssignment(assn)">{{assn}}</li>
-                  <li class="clickable assn-new" @click="addAssignment()">New</li>
                 </ul>
               </div>
             </div>
@@ -62,47 +61,10 @@
         <div class="row">
           <div class="col-8">
             <!-- assignment title -->
-            <h1 contenteditable="true" ref="name" @blur="requestUpdate('name')">{{name}}</h1>
+            <h1 ref="name">{{name}}</h1>
           </div>
           <div class="col-4">
-            <h4 class="float-right" style="vertical-align:bottom">Possible: <span contenteditable="true" ref="total_Pts" @blur="requestUpdate('total_Pts')">{{totalPts}}</span></h4>
-          </div>
-        </div>
-
-        <br>
-
-        <h4>Rules</h4>
-        <div class="row">
-          <div class="col-6"><img v-if="!plusFormActive" src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Open Add Fields"></div>
-          <div class="col-6"><img src="img/reply.svg" class="clickable float-right undoButton" @click="undo()" title="Undo rule delete"></div>
-        </div>
-
-        <!-- rules rows -->
-        <div v-for="(rule, i) of rules" :key="rule.desc">
-          <!-- TODO -->
-          <div>
-            <!-- rule display fields -->
-            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            <span v-if="isEditing!=i">{{rule.pts | positive}} {{rule.desc}}</span>
-
-            <!-- rule edit fields -->
-            <input type="text" name="points" class="col-xl-1" v-model.number.lazy="rule.pts" v-if="isEditing==i" @keyup.enter="disableEdit(i)">
-            <input type="text" name="desc" class="col-xl-10" v-model.trim.lazy="rule.desc" v-if="isEditing==i" @keyup.enter="disableEdit(i)">
-
-            <!-- rule actions -->
-            <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
-            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
-          </div>
-        </div>
-
-        <br>
-
-        <!-- add row -->
-        <div v-if="plusFormActive">
-          <div class="row">
-            <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()" placeholder="0" title="pts (positive or negative)">
-            <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-            <button class="col-xl-1 btn btn-sm btn-info btn-block" @click="addRule()" title="Add">Add</button>
+            <h4 class="float-right" style="vertical-align:bottom">Possible: <span ref="total_Pts">{{totalPts}}</span></h4>
           </div>
         </div>
 
@@ -128,28 +90,7 @@
         <!-- comment area -->
         <div>
           <h4>Comments</h4>
-          <p id="copyText" v-for="(comment, index) in comments" contenteditable="true" ref="commentText" @blur="requestUpdate('commentText')">{{comment.text}}</p>
-          <!-- new comment -->
-          <textarea class="margin-bot" style="width: 100%" id="add_comment" placeholder="Add a comment..." @keyup.enter="addComment"></textarea>
-          <!-- comment actions -->
-          <div class="row">
-
-            <div class="col-12">
-              <!-- clear comments -->
-              <button class="btn btn-warning" @click="clearComments">Clear comments</button>
-              <button class="btn btn" data-clipboard-target="#copyText">Copy Comments</button>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- assignment-wide actions -->
-        <div class="row margin-bot">
-          <div class="col-12">
-            <!-- save assignment -->
-            <button class="btn btn-info float-right" @click="saveToServer">Save Assignment</button>
-          </div>
-
+          <p id="copyText" v-for="(comment, index) in comments" ref="commentText">{{comment.text}}</p>
         </div>
 
         <!-- NEEDS REFACTORING - placeholder empty space to fill bottom of the page -->

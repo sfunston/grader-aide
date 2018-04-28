@@ -9,7 +9,7 @@ https://goo.gl/Y846mt
     [x] Copy assignment comments(clipboard.js)
     [x] Testing (selenium)
     [] Authentication
-    [] Student view and Grader View
+    [x] Student view and Grader View
     [] Grader  must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
