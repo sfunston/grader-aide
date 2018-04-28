@@ -7,10 +7,10 @@ https://goo.gl/Y846mt
     Client
     [] Vue routing
     [x] Copy assignment comments(clipboard.js)
-    [] Testing (selenium)
+    [x] Testing (selenium)
     [] Authentication
     [] Student view and Grader View
-    [] Grader must be able to add, delete, change, and list assignments in course
+    [] Grader  must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
     [] Testing
@@ -27,7 +27,7 @@ https://goo.gl/Y846mt
     [] Vue CLI/single page components
 
     Repo
-    [] Github
+    [x] Github
           - all code
           - readme with example code and/or usage
 
