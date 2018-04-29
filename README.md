@@ -5,12 +5,12 @@ https://goo.gl/Y846mt
 
 ### Final Project ###
     Client
-    [] Vue routing
+    [~] Vue routing
     [x] Copy assignment comments(clipboard.js)
-    [x] Testing (selenium)
+    [~] Testing (selenium)
     [] Authentication
     [x] Student view and Grader View
-    [] Grader  must be able to add, delete, and change courses, and list assignments within a course.
+    [~] Grader  must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
     [] Testing
