@@ -59,7 +59,7 @@ EXAMPLE COMMANDS
           - router serving course REST via Mongo collections
           - router serving assignment REST via Mongo Documents within a collection
     [] Security
-    [] Authentication, how is up to you
+    [x] Authentication, how is up to you // cleartext
     [] Vue CLI/single page components
 
     Repo

@@ -265,31 +265,53 @@ server.post('/login', function(req, res) {
         user.name = req.body.username;
         user.group = req.body.group;
         user.pass = req.body.password;
-        console.log(req.body.register);
+        
+        console.log("Register: " + req.body.register);
         
         // REGISTRATION (if checked)
-        if (req.body.register != undefined && req.body.register[1] == 1) { // if checkbox checked, register user instead
+        if (req.body.register != undefined && req.body.register.length > 1) { // if checkbox checked, register user instead
             registerUser(user, users, function() {
                 res.status(200).send(`Registration success. User ${user.name} registered.`);
             });
         }
         
         // AUTHENTICATION & AUTHORIZATION (for existing users)
+        // TODO - Salt and hash passwords
         else {
             listUsers(users, function(userlist) {
-                let found = false;
+                let status = 0;
                 userlist.forEach(function(dbuser) {
                     if (dbuser.name == user.name) {
-
-                        found = true;
+                        
+                        status = 1; // user found
+                        
+                        if (dbuser.group == user.group) {
+                            status = 2; // group valid
+                            
+                            if(dbuser.pass == user.pass) {
+                                status = 3; // password correct
+                            }
+                        }
 
                     }
                 });
-                if (found) {
-                    res.status(200).send(`Login success. User ${user.name} found!`);
-                }
-                else {
-                    res.status(403).send(`Login fail. User ${user.name} does not exist!`);
+                
+                switch(status) {
+                    case 0:
+                        res.status(403).send(`Login fail. User ${user.name} does not exist!`);
+                        break;
+                    case 1:
+                        res.status(403).send(`Login fail. User does not have ${user.group} permissions`);
+                        break;
+                    case 2:
+                        res.status(403).send(`Login fail. Incorrect password for ${user.name}`);
+                        break;
+                    case 3:
+                        res.status(200).send(`Login success. User ${user.name} as ${user.group}`);
+                        break;
+                    default:
+                        res.status(500).send(`Server error`);
+                        break;
                 }
 
             });
