@@ -3,6 +3,42 @@
 ### REST Contract ###
 https://goo.gl/Y846mt
 
+### MongoDB Container ###
+host: mongo.parkerhill.me
+port: 27017
+authdb: admin
+user: cloud9
+pass: 2MJp3b3DpMmN7W48
+
+TO CONNECT
+    $ mongo -u cloud9 -p --authenticationDatabase admin --host mongo.parkerhill.me
+    
+EXAMPLE COMMANDS
+    db.createUser(
+      {
+        user: "cloud9",
+        pwd: "2MJp3b3DpMmN7W48",
+        roles: [ 
+                  { role: "userAdminAnyDatabase", db: "admin" },
+                  { role: "readWriteAnyDatabase", db: "admin" },
+                  { role: "dbAdminAnyDatabase", db: "admin" },
+                  { role: "clusterAdmin", db: "admin" }
+        ]
+      }
+    );
+    
+    db.updateUser(
+    	"cloud9",
+    	{
+    		roles: [
+                  { role: "userAdminAnyDatabase", db: "admin" },
+                  { role: "readWriteAnyDatabase", db: "admin" },
+                  { role: "dbAdminAnyDatabase", db: "admin" },
+                  { role: "clusterAdmin", db: "admin" }
+    		]
+    	}
+    );
+
 ### Final Project ###
     Client
     [~] Vue routing
@@ -10,14 +46,14 @@ https://goo.gl/Y846mt
     [~] Testing (selenium)
     [] Authentication
     [x] Student view and Grader View
-    [~] Grader  must be able to add, delete, and change courses, and list assignments within a course.
+    [~] Grader must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
     [] Testing
           - positive and negative test
           - Mocha + Chai (+ Sinon TBD)
           - Must test REST (supertest)
-    [] MongoDB running in a Docker container
+    [x] MongoDB running in a Docker container
     [] Routers used by app.js
           - router serving files from public
           - router serving course REST via Mongo collections

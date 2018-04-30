@@ -1,79 +1,211 @@
 console.log('\nLoading Server');
 
+const PORT = 8080;
+
 // load modules
-let express = require('express');
-let logger = require('morgan');
-let compression = require('compression');
-let favicon = require('serve-favicon');
-let bodyParser = require('body-parser');
-let path = require('path');
-let fs = require('fs');
+const express = require('express');
+const logger = require('morgan');
+const compression = require('compression');
+const favicon = require('serve-favicon');
+const bodyParser = require('body-parser');
+const path = require('path');
+const helmet = require('helmet');
+const fs = require('fs');
+const assert = require('assert');
+const mongo = require('mongodb').MongoClient;
 
-//TODO security
+const mongoUrl = 'mongodb://cloud9:2MJp3b3DpMmN7W48@mongo.parkerhill.me:27017/test';
 
-let app = express();
+// Use connect method to connect to the server
+let mongoClient;
+let docs, assignments, classes, users;
+mongo.connect(mongoUrl, function(err, client) {
 
-// express middleware
-app.use(logger('dev'));
-app.use(favicon(path.join(__dirname, 'client', 'favicon.ico')));
+    mongoClient = client;
+    assert.equal(err, null);
 
-//GET IT WORKING
-//3. how to get uvu's real favicon.ico?
-//4. use it
-//5. clean up/remove the file(s)
+    // Define working databases
+    docs = mongoClient.db('documents'); // test database
+    assignments = mongoClient.db('assignments'); // stores class assignments
+    classes = mongoClient.db('classes'); // stores information about classes
+    users = mongoClient.db('users'); // used for authenticating users
 
-//GET IT RIGHT
-//6. ask nodeJs for the OS path separator and use it
-//7. can we do better?
+    console.log('Connected successfully to server');
+});
 
-//GET IT FAST
-//8. why don't we need to worry about faster in this specific case?
+const insertDocuments = function(db, callback) {
+    // Get the documents collection
+    const collection = db.collection('documents');
+    // Insert some documents
+    collection.insertMany([
+        { a: 1 }, { a: 2 }, { a: 3 }
+    ], function(err, result) {
+        assert.equal(err, null);
+        assert.equal(3, result.result.n);
+        assert.equal(3, result.ops.length);
+        console.log("Inserted 3 documents into the collection");
+        callback(result);
+    });
+}
 
-//9. 
+var emptyDatabase = function(db, callback) {
 
-app.use(compression());
-//for mime type application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-//for mime type application/json
-app.use(bodyParser.json());
+    const collection = db.collection('users');
+
+    collection.deleteMany({}, function(err, result) {
+
+        assert.equal(err, null);
+        callback(result);
+
+    });
+
+}
+
+var registerUser = function(user, db, callback) {
+
+    const collection = db.collection('users');
+    // Insert some documents
+    collection.update(user, user, { upsert: true }, function(err, result) { // by using "update", you eliminate possibility of creating duplicate DB entries
+        assert.equal(err, null);
+        assert.equal(1, result.result.n);
+        console.log(`User ${user.name} registered`);
+        callback(result);
+    });
+
+    /*
+    collection.insert(user, function(err, result) {
+      assert.equal(err, null);
+      assert.equal(1, result.result.n);
+      console.log(`User ${user.name} registered`);
+      callback(result);
+    });    
+    */
+
+}
+
+/*
+var checkUser = function(user, db, callback) {
+    
+    const collection = db.collection('users');
+
+    var result = collection.find({"name": user.name}).toArray();
+    if(result.length > 0) {
+        callback(true);
+    } else {
+        callback(false);
+    }
+    
+}
+*/
+
+var listUsers = function(db, callback) {
+
+    const collection = db.collection('users');
+    collection.find({}).toArray(function(err, result) {
+        assert.equal(err, null);
+        callback(result);
+
+    });
+
+}
+
+// TODO 15 horsefeathers
+
+// create express server
+const server = express();
+
+const webRoot = path.join(__dirname, 'client');
+
+// have express server use middleware
+server.use(favicon(path.join(webRoot, 'favicon.ico')));
+server.use(logger('dev'));
+server.use(compression());
+server.use(bodyParser.urlencoded({ extended: false })); //serverlication/x-www-form-urlencoded
+server.use(bodyParser.json()); //serverlication/json
+server.use(helmet());
+
+server.use(express.static(webRoot));
 
 //TODO handle REST stuff
+/*
 
-app.use(express.static(path.join(__dirname, 'client')));
+//TODO 7 add course CRUD
+//TODO 9 spike solution for MongoDB CRUD, 
+//       admin console
+//       mongoose, crest
+
+//C)reate 
+//TODO 13 mongo
+app.post('/api/v1/:courseId', function(req, res) {
+  const courseId = req.params.courseId;
+  res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
+
+//R)ead 
+//TODO 10 mongo
+app.get('/api/v1/:courseId/:assignmentId', function(req, res) {
+  const courseId = req.params.courseId;
+  const assignmentId = req.params.assignmentId;
+  console.log(courseId, assignmentId);
+  res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
+
+//U)pdate 
+//TODO 12 mongo
+app.put('/api/v1/:courseId/:assignmentId', function(req, res) {
+  const courseId = req.params.courseId;
+  const assignmentId = req.params.assignmentId;
+  res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
+
+//D)elete 
+//TODO 11 mongo
+app.delete('/api/v1/:courseId/:assignmentId', function(req, res) {
+  const courseId = req.params.courseId;
+  const assignmentId = req.params.assignmentId;
+  res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
+
+app.use(express.static(webRoot));
+app.get('*', (req, res) =>{
+  res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
+
+*/
 
 // Load list of assignments
-app.get('/api/v1/assignments', function(req, res) {
+server.get('/api/v1/assignments', function(req, res) {
     fs.readdir(path.join(__dirname, 'client', 'assignments'), (err, files) => {
         if (err) {
             res.status(500).send('Server could not read assignments directory.');
         }
-        
-        let fileList = {assignments: []};
+
+        let fileList = { assignments: [] };
         files.forEach(file => {
             if (file.indexOf('.json') > -1) {
-                fileList.assignments.push(path.basename(file,'.json'));
+                fileList.assignments.push(path.basename(file, '.json'));
             }
         });
 
         res.status(200).send(JSON.stringify(fileList));
-        
+
     });
-    
+
 });
 
-app.get('/api/v1/assignments/default', function(req, res) {
+server.get('/api/v1/assignments/default', function(req, res) {
     fs.readdir(path.join(__dirname, 'client', 'assignments'), (err, files) => {
         if (err) {
             res.status(500).send('Server could not read assignments directory.');
         }
-        
-        let fileList = {assignments: []};
+
+        let fileList = { assignments: [] };
         files.forEach(file => {
             if (file.indexOf('.json') > -1) {
                 fileList.assignments.push(file);
             }
         });
-        
+
         // Get the first file
         fs.readFile(path.join(__dirname, 'client', 'assignments', fileList.assignments[0]), function(err, content) {
             res.writeHead(200, {
@@ -87,11 +219,11 @@ app.get('/api/v1/assignments/default', function(req, res) {
             res.write(content);
             res.end();
         });
-        
+
     });
 });
 
-app.get('/api/v1/assignments/:name', function(req, res) {
+server.get('/api/v1/assignments/:name', function(req, res) {
     if (req.params.name != 'null') {
         fs.readFile(path.join(__dirname, 'client', 'assignments', `${req.params.name}.json`), function(err, content) {
             res.writeHead(200, {
@@ -106,14 +238,93 @@ app.get('/api/v1/assignments/:name', function(req, res) {
             res.end();
         });
 
-    } else {
+    }
+    else {
         res.status(404).send('Requested assignment does not exist!');
     }
 
 })
 
+// List users
+server.get('/users', function(req, res) {
+
+    listUsers(users, function(userlist) {
+
+        res.status(200).send(JSON.stringify(userlist));
+
+    });
+
+});
+
+// Register user
+server.post('/login', function(req, res) {
+
+    if (req.body.username && req.body.group && req.body.password) {
+
+        var user = new Object();
+        user.name = req.body.username;
+        user.group = req.body.group;
+        user.pass = req.body.password;
+        console.log(req.body.register);
+        
+        // REGISTRATION (if checked)
+        if (req.body.register != undefined && req.body.register[1] == 1) { // if checkbox checked, register user instead
+            registerUser(user, users, function() {
+                res.status(200).send(`Registration success. User ${user.name} registered.`);
+            });
+        }
+        
+        // AUTHENTICATION & AUTHORIZATION (for existing users)
+        else {
+            listUsers(users, function(userlist) {
+                let found = false;
+                userlist.forEach(function(dbuser) {
+                    if (dbuser.name == user.name) {
+
+                        found = true;
+
+                    }
+                });
+                if (found) {
+                    res.status(200).send(`Login success. User ${user.name} found!`);
+                }
+                else {
+                    res.status(403).send(`Login fail. User ${user.name} does not exist!`);
+                }
+
+            });
+        }
+
+
+
+    }
+
+});
+
+// Empty users database
+server.get('/empty', function(req, res) {
+    emptyDatabase(users, function() {
+        res.status(200).send("Success!");
+    })
+});
+
+/*
+// Process login
+server.post('/login', function(req, res) {
+    
+    //DEBUGGING -- return res.status(200).send(`username ${req.body.username} group ${req.body.group} password ${req.body.password}`);
+
+    if(req.body.username && req.body.group && req.body.password) {
+        
+        // AUTHENTICATE AND AUTHORIZE
+        
+    }
+    
+});
+*/
+
 // Save single file
-app.post('/api/v1/assignments/:name', function(req, res) {
+server.post('/api/v1/assignments/:name', function(req, res) {
     let filename = `${req.params.name}.json`;
     let json = {
         name: req.params.name,
@@ -132,9 +343,23 @@ app.post('/api/v1/assignments/:name', function(req, res) {
     });
 });
 
-app.get('*', function(req, res) {
+server.get('*', function(req, res) {
     res.status(404).send(`You asked for a file that doesn't exist. You are a hoser.`);
 });
 
+// Default route
+server.get('*', (req, res) => {
+    res.status(404).sendFile(path.join(webRoot, '404.html'));
+});
 
-app.listen(8080);
+
+server.listen(PORT);
+
+function gracefulShutdown() {
+    console.log('\nStarting Shutdown');
+    server.close(() => console.log('\nShutdown Complete'));
+}
+
+process.on('SIGINT', gracefulShutdown);
+
+process.on('SIGTERM', gracefulShutdown);
