@@ -35,45 +35,35 @@
 
       <!-- sidebar -->
       <div class="col-3">
-        <div class="accordion">
-          <div class="card text-secondary">
-            <div class="card-header" id="headingOne">
-              <h4>
-                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                  CS 4690
-                </button>
-              </h4>
-            </div>
-
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-              <div class="card-body">
-                <ul>
-                  <li v-for="(assn, i) of assignments" class="clickable assn" @click="selectAssignment(assn)">{{assn}}</li>
-                  <li class="clickable assn-new" @click="addAssignment()">New</li>
-                </ul>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      
+        <img src="img/plusGreen.svg" class="clickable" @click="createCourse" title="Add course">
         
+        <!-- Course -->
         <div class="accordion">
-          <div class="card text-secondary">
-            <div class="card-header">
-              <h4>                
-                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                  CS 3670
-                </button>
-              </h4>
-            </div>
-            
-              <div class="card-body">
-                <ul>
-                  <li>TODO</li>
-                </ul>
+          <span v-for="(course, i) in courses">
+            <div class="card text-secondary">
+              <div class="card-header" id="headingOne">
+                <h4>
+                  <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <span v-if="isEditing!=i">
+                      {{course.name}}
+                    </span>
+                  </button>
+                  <input type="text" name="course" class="col-xl-8 float-left" v-model.lazy="course.name" v-if="isEditing==i" @keyup.enter="disableEdit(i)">
+                  <img src="img/pencilBlack.svg" class="clickable float-right" @click="enableEdit(i)" title="Edit">
+                  <img src="img/xRed.svg" class="clickable float-right" @click="deleteCourse(i)" title="Remove">
+                </h4>
               </div>
-          </div>          
+              <!-- Assignment list -->
+              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                <div class="card-body">
+                  <ul>
+                    <li v-for="(assn, i) of assignments" class="clickable assn" @click="selectAssignment(assn)">{{assn}}</li>
+                    <li class="clickable assn-new" @click="addAssignment()">New</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </span>
         </div>
       </div>
       
@@ -190,6 +180,7 @@
     let app = new Vue({
       el: '#app',
       data: { //persisted data
+        courses: [],
         assignments: [],
         name: null,
         totalPts: 0,
@@ -201,7 +192,9 @@
         addNum: null,
         addDesc: null,
         plusFormActive: false,
-        isEditing: -1
+        isEditing: -1,
+        courseIndex: 0,
+        assnIndex: 0
       },
       filters: {
         positive: function(num) { //TODO make all caps
@@ -253,6 +246,15 @@
             this.rules.push(this.ruleHistory.pop());
           }
         },
+        createCourse: function() {
+          let newCourse = {name: "Untitled", assignments: []};
+          
+          this.courseIndex = this.courses.push(newCourse) - 1;
+          
+        },
+        deleteCourse: function(i) {
+          this.courses.splice(i, 1);
+        },
         addAssignment: function() {
           let self = this;
 
@@ -303,7 +305,7 @@
         refreshAssignments: function() {
           let self = this;
           // Refresh assignments list
-          axios.get('/api/v1/assignments')
+          axios.get('/api/v1/assignments/')
             .then(function(response) {
               self.assignments = response.data.assignments;
             })
@@ -314,8 +316,7 @@
       },
       created: function() {
         let self = this;
-
-
+        
         // Try to load first assignment from server
         axios.get('/api/v1/assignments/default')
           .then(function(response) {
