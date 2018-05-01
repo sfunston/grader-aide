@@ -54,9 +54,9 @@ EXAMPLE COMMANDS
     [~] Vue routing
     [x] Copy assignment comments(clipboard.js)
     [~] Testing (selenium)
-    [] Authentication
+    [x] Authentication
     [x] Student view and Grader View
-    [~] Grader must be able to add, delete, and change courses, and list assignments within a course.
+    [x] Grader must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
     [] Testing
