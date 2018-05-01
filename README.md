@@ -1,5 +1,15 @@
 # README #
 
+### App testing logins ###
+
+'Student' group
+user: student
+pass: student
+
+'Grader' group
+user: grader
+pass: grader
+
 ### REST Contract ###
 https://goo.gl/Y846mt
 

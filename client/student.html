@@ -4,32 +4,66 @@
 <head>
   <meta charset="UTF-8">
   <title>GraderAide</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/styles.css">
   
+  <!-- Boostrap 4 -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
   <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+  
   
 </head>
 
 <body>
-  <div class="container-fluid uvu-color dropshadow-near">
-    <div class="container">
-      <div class="row">
-        <div class="col-6">
-          <h3 class="no-margin-bot">GraderAide</h3>
-        </div>
-        <div class="col-6">
-          <img class="float-right profile-img margin-top-sm" height=24 width=24 src="https://parkerhill.me/wp-content/uploads/2017/03/17270234_10155060248629501_567641921_n-e1489522777655.jpg">
-          <h5 class="float-right profile-text">Joe Shmoe</h5>
-        </div>
+  <div class="content">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark uvu-color justify-content-between">
+      
+      <a class="navbar-brand" href="/">GraderAide</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+            <a class="nav-link" href="#"></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#"></a>
+          </li>
+          
+        </ul>
+        
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img class="profile-img d-inline-block" style="margin-right:4px" height=30 width=30 src="https://parkerhill.me/wp-content/uploads/2017/03/17270234_10155060248629501_567641921_n-e1489522777655.jpg">
+              Joe Shmoe
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">Profile</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="/logout">Logout</a>
+            </div>
+          </li>
+        </ul>
+
       </div>
-    </div>
+    </nav>
   </div>
-    <a href="grader.html">Go to grader view</a>
+  
   <div class="container padding-top body-color dropshadow-near" id="app">
     <div class="row">
 
@@ -125,7 +159,7 @@
     /* global axios */
     /* global Vue */
     /* global ClipboardJS */
-    
+        
     var clipboard = new ClipboardJS('.btn');
     let app = new Vue({
       el: '#app',
