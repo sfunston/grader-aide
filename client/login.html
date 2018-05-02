@@ -1,0 +1,148 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GraderAide</title>
+  <link rel="stylesheet" href="/css/login.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
+  <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+</head>
+
+<body>
+<div class="div-center">
+  <h1 class="logo">GraderAide</h1>
+  <div class="content" id="app">
+    <div class="form-group">
+      
+      <form class="login-form" @submit.prevent="tryLogin"><!--action="/login" method="post">-->
+        
+        <div class="input-group mb-1">
+          <input class="form-control" type="text" name="username" placeholder="username" v-model="user.name"/>
+        </div>
+        <div class="input-group mb-1">
+          <input class="form-control" type="password" name="password" placeholder="password" v-model="user.pass"/>
+        </div>
+        <div class="input-group mb-1">
+          <div class="checkbox">
+            <input type="checkbox" name="register" value="0" v-model="user.register"/>
+          </div>
+        </div>
+        
+        <div class="input-group">
+            <select name="group" class="custom-select" id="group" v-model="user.group">
+              <option value="student">Student</option>
+              <option value="grader">Grader</option>
+            </select>
+            <div class="input-group-append">
+              <input type="submit" class="btn btn-primary btn-block" value="Login">
+            </div>
+        </div>
+        
+      </form>
+    </div>
+    
+    <div v-if="status == 0" class="alert alert-success fade show" role="alert">
+      <span><strong>Success </strong>{{loginMessage}}</span>
+    </div>
+    <div v-if="status == 1" class="alert alert-danger fade show" role="alert">
+      <span><strong>Error </strong>{{loginMessage}}</span>
+    </div>
+    
+  </div>
+</div>
+<div style="padding:5px">
+
+        <h3 style="color:white">Admin Tools</h3>
+
+        <form action="/empty" method="post">
+          <input class="btn btn-outline-danger btn-sm" type="submit" value="Delete All Users">
+        </form>
+
+        <form action="/session" method="post">
+          <input class="btn btn-outline-light btn-sm" type="submit" value="Post Session Info">
+        </form>
+
+        <form action="/session" method="get">
+          <input class="btn btn-outline-light btn-sm" type="submit" value="Get Session Info">
+        </form>
+
+</div>
+
+<script>
+
+    /* global axios */
+    /* global Vue */
+        
+    let app = new Vue({
+      el: '#app',
+      data: { //persisted data
+        user: {
+          name: "",
+          pass: "",
+          register: false,
+          group: "student"
+        },
+        loginMessage: "",
+        status: -1
+      /*
+        assignments: [],
+        name: null,
+        totalPts: 0,
+        rules: [],
+        comments: [],
+        ruleHistory: [],
+        //temporary gui state
+        selectedRules: [],
+        addNum: null,
+        addDesc: null,
+        plusFormActive: false,
+        isEditing: -1
+        */
+      },
+      filters: {
+        /*
+        positive: function(num) { //TODO make all caps
+          if (num > 0) return `+${num}`;
+          return num;
+        }
+        */
+      },
+      computed: {
+        /*
+        actualPts: function() { //add up all selected pts and subtract from totalPts
+          return this.selectedRules.reduce((acc, el) => parseInt(acc) + parseInt(el.pts), this.totalPts);
+        }
+        */
+      },
+      methods: {
+        tryLogin: function() {
+          let self = this;
+          
+          // Attempt login
+          axios.post('/login', {
+              username: self.user.name,
+              password: self.user.pass,
+              register: self.user.register,
+              group: self.user.group
+            })
+            .then(function(response) {
+              self.status = 0;
+              self.loginMessage = response.data;
+              window.location = "/";
+            })
+            .catch(function(error) {
+              self.status = 1;
+              self.loginMessage = error.response.data;
+            });
+          
+        }
+      },
+      created: function() { // things to do when Vue app is loaded
+        // do nothing (yet)
+      }
+    });
+    
+</script>
+</body>
+</html>

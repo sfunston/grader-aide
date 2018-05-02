@@ -48,15 +48,33 @@ EXAMPLE COMMANDS
     		]
     	}
     );
+	 
+### Running Selenium tests ###
+    Make sure to have Ruby installed https://www.ruby-lang.org/en/downloads/
+    
+    1. Install bundler
+    gem install bundler
+    
+    2. Install geckodriver
+    npm install geckodriver
+    
+    3. Change to test directory
+    cd client/test
+    
+    4. Install gems
+    bundle install
+    
+    5. Run test file
+    Example: rspec login-test.rb	 
 
 ### Final Project ###
     Client
-    [~] Vue routing
+    [] Vue routing
     [x] Copy assignment comments(clipboard.js)
-    [~] Testing (selenium)
-    [] Authentication
+    [x] Testing (selenium)
+    [x] Authentication
     [x] Student view and Grader View
-    [~] Grader must be able to add, delete, and change courses, and list assignments within a course.
+    [x] Grader must be able to add, delete, and change courses, and list assignments within a course.
     
     Server
     [] Testing
