@@ -457,12 +457,12 @@ server.post('/login', function(req, res) {
         user.group = req.body.group;
         user.pass = req.body.password;
         
-        console.log("Register: " + req.body.register);
+        //console.log(`Name: ${req.body.username} Pass: ${req.body.password} Reg: ${req.body.register} Group: ${req.body.group}`);
         
         // REGISTRATION (if checked)
-        if (req.body.register != undefined && req.body.register.length > 1) { // if checkbox checked, register user instead
+        if (req.body.register) { // if checkbox checked, register user instead
             registerUser(user, users, function() {
-                res.status(200).send(`Registration success. User ${user.name} registered.`);
+                res.status(200).send(`Registered user ${user.name}`);
             });
         }
         
@@ -500,17 +500,18 @@ server.post('/login', function(req, res) {
                 
                 switch(status) {
                     case 0:
-                        res.status(403).send(`Login fail. User ${user.name} does not exist!`);
+                        res.status(403).send(`User does not exist`);
                         break;
                     case 1:
-                        res.status(403).send(`Login fail. User does not have ${user.group} permissions`);
+                        res.status(403).send(`${user.name} is not a ${user.group}`);
                         break;
                     case 2:
-                        res.status(403).send(`Login fail. Incorrect password for ${user.name}`);
+                        res.status(403).send(`Incorrect password`);
                         break;
                     case 3:
                         // Successful login. Redirect user to appropriate page (root router handles this)
-                        res.redirect('/');
+                        res.status(200).send(`Redirecting...`);
+                        //res.status(304).redirect('/');
                         // res.status(200).send(`Login success. User ${user.name} as ${user.group}`);
                         break;
                     default:
